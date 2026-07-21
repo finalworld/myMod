@@ -16,7 +16,7 @@ jobs:
         run: |
           rm -rf bubbsun
           mkdir -p bubbsun
-          unzip -o Bubbsun_v0.300_Retro_Edition_GitHub_ready.zip -d bubbsun
+          unzip -o Bubbsun_v0.300_Retro_Edition_GitHub_ready_FIXED.zip -d bubbsun
 
       - name: Installera Java 17
         uses: actions/setup-java@v4
@@ -29,6 +29,11 @@ jobs:
         with:
           gradle-version: "8.9"
 
+      - name: Kontrollera projektfiler
+        run: |
+          test -f bubbsun/settings.gradle.kts || test -f bubbsun/settings.gradle
+          test -f bubbsun/build.gradle.kts || test -f bubbsun/build.gradle
+
       - name: Bygg APK
         working-directory: bubbsun
         run: gradle assembleDebug --stacktrace
@@ -38,4 +43,4 @@ jobs:
         with:
           name: Bubbsun-v0.300-Retro-Edition-APK
           path: bubbsun/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error 
+          if-no-files-found: error
