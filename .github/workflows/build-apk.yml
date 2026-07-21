@@ -21,20 +21,25 @@ jobs:
       - name: Hitta Android-projektet
         shell: bash
         run: |
-          set -euo pipefail
+          set -e
 
-          SETTINGS_FILE="$(find . -type f -name 'settings.gradle.kts' -o -name 'settings.gradle' -print -quit)"
+          SETTINGS_FILE="$(find . -type f -name 'settings.gradle.kts' -print -quit)"
 
           if [ -z "$SETTINGS_FILE" ]; then
-            echo "FEL: settings.gradle.kts eller settings.gradle saknas."
-            echo "Ladda upp innehållet i projektets ZIP till repot, inte själva ZIP-filen."
-            find . -maxdepth 3 -type f | sort
+            SETTINGS_FILE="$(find . -type f -name 'settings.gradle' -print -quit)"
+          fi
+
+          if [ -z "$SETTINGS_FILE" ]; then
+            echo "FEL: Kunde inte hitta settings.gradle.kts eller settings.gradle."
+            echo "Filer som finns i repot:"
+            find . -maxdepth 4 -type f | sort
             exit 1
           fi
 
           PROJECT_DIR="$(dirname "$SETTINGS_FILE")"
+
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
-          echo "Projektmapp: $PROJECT_DIR"
+          echo "Android-projektet hittades i: $PROJECT_DIR"
 
       - name: Installera Java 17
         uses: actions/setup-java@v4
@@ -49,7 +54,9 @@ jobs:
         shell: bash
         run: |
           yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          sdkmanager "platform-tools"
+          sdkmanager "platforms;android-35"
+          sdkmanager "build-tools;35.0.0"
 
       - name: Installera Gradle 8.9
         uses: gradle/actions/setup-gradle@v4
@@ -61,12 +68,27 @@ jobs:
         run: |
           if [ ! -f "$PROJECT_DIR/app/build.gradle.kts" ] && [ ! -f "$PROJECT_DIR/app/build.gradle" ]; then
             echo "FEL: app/build.gradle.kts eller app/build.gradle saknas."
+            echo "Innehåll i projektmappen:"
+            find "$PROJECT_DIR" -maxdepth 3 -type f | sort
             exit 1
           fi
+
+          echo "Appmodulen hittades."
 
       - name: Bygg debug-APK
         shell: bash
         run: |
           if [ -f "$PROJECT_DIR/gradlew" ]; then
             chmod +x "$PROJECT_DIR/gradlew"
-            "$PROJECT_DIR/gradlew" -p "$
+            cd "$PROJECT_DIR"
+            ./gradlew :app:assembleDebug --stacktrace
+          else
+            gradle -p "$PROJECT_DIR" :app:assembleDebug --stacktrace
+          fi
+
+      - name: Ladda upp APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Bubbsun-v0.321-APK
+          path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
