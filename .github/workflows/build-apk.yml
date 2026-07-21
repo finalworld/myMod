@@ -1,47 +1,33 @@
-name: Bygg Bubbsun v0.301 APK
+name: Build Bubbsun APK
 
 on:
   workflow_dispatch:
-  push:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Hämta filer
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Packa upp Bubbsun v0.301
-        run: |
-          rm -rf bubbsun
-          mkdir -p bubbsun
-          unzip -o Bubbsun_v0.301_Retro_Edition_GitHub_ready.zip -d bubbsun
-
-      - name: Installera Java 17
+      - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: '17'
 
-      - name: Installera Gradle 8.9
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: "8.9"
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
 
-      - name: Kontrollera projektet
-        run: |
-          test -f bubbsun/settings.gradle.kts
-          test -f bubbsun/build.gradle.kts
-          test -f bubbsun/app/build.gradle.kts
+      - name: Grant execute permission
+        run: chmod +x gradlew
 
-      - name: Bygg APK
-        working-directory: bubbsun
-        run: gradle assembleDebug --stacktrace
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
 
-      - name: Spara APK
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Bubbsun-v0.301-Retro-Edition-APK
-          path: bubbsun/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
+          name: Bubbsun-v0.320-release
+          path: app/build/outputs/apk/release/*.apk
