@@ -1,4 +1,4 @@
-name: Bygg Bubbsun v0.200 APK
+name: Bygg Bubbsun v0.201 APK
 
 on:
   workflow_dispatch:
@@ -12,11 +12,11 @@ jobs:
       - name: Hämta filer
         uses: actions/checkout@v4
 
-      - name: Packa upp Bubbsun v0.200
+      - name: Packa upp Bubbsun v0.201
         run: |
           rm -rf bubbsun
           mkdir -p bubbsun
-          unzip -o Bubbsun_v0.200_Retro_Vintage_Edition_GitHub_ready.zip -d bubbsun
+          unzip -o Bubbsun_v0.201_Retro_Vintage_Fixed_GitHub_ready.zip -d bubbsun
 
       - name: Installera Java 17
         uses: actions/setup-java@v4
@@ -36,6 +36,6 @@ jobs:
       - name: Spara APK
         uses: actions/upload-artifact@v4
         with:
-          name: Bubbsun-v0.200-Retro-Vintage-APK
+          name: Bubbsun-v0.201-Retro-Vintage-APK
           path: bubbsun/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
