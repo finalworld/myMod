@@ -1,4 +1,4 @@
-name: Bygg Bubbsun v0.300 APK
+name: Bygg Bubbsun v0.301 APK
 
 on:
   workflow_dispatch:
@@ -12,11 +12,11 @@ jobs:
       - name: Hämta filer
         uses: actions/checkout@v4
 
-      - name: Packa upp Bubbsun v0.300
+      - name: Packa upp Bubbsun v0.301
         run: |
           rm -rf bubbsun
           mkdir -p bubbsun
-          unzip -o Bubbsun_v0.300_Retro_Edition_GitHub_ready_FIXED.zip -d bubbsun
+          unzip -o Bubbsun_v0.301_Retro_Edition_GitHub_ready.zip -d bubbsun
 
       - name: Installera Java 17
         uses: actions/setup-java@v4
@@ -29,10 +29,11 @@ jobs:
         with:
           gradle-version: "8.9"
 
-      - name: Kontrollera projektfiler
+      - name: Kontrollera projektet
         run: |
-          test -f bubbsun/settings.gradle.kts || test -f bubbsun/settings.gradle
-          test -f bubbsun/build.gradle.kts || test -f bubbsun/build.gradle
+          test -f bubbsun/settings.gradle.kts
+          test -f bubbsun/build.gradle.kts
+          test -f bubbsun/app/build.gradle.kts
 
       - name: Bygg APK
         working-directory: bubbsun
@@ -41,6 +42,6 @@ jobs:
       - name: Spara APK
         uses: actions/upload-artifact@v4
         with:
-          name: Bubbsun-v0.300-Retro-Edition-APK
+          name: Bubbsun-v0.301-Retro-Edition-APK
           path: bubbsun/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
