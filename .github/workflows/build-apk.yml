@@ -1,4 +1,4 @@
-name: Bygg Bubbsun v0.323 APK
+name: Bygg Bubbsun v0.324 APK
 
 on:
   workflow_dispatch:
@@ -23,10 +23,10 @@ jobs:
         run: |
           set -e
 
-          SETTINGS_FILE=$(find . -path './.git' -prune -o -type f -name 'settings.gradle.kts' -print -quit)
+          SETTINGS_FILE=$(find . -type f -name 'settings.gradle.kts' -not -path './.git/*' -print -quit)
 
           if [ -z "$SETTINGS_FILE" ]; then
-            SETTINGS_FILE=$(find . -path './.git' -prune -o -type f -name 'settings.gradle' -print -quit)
+            SETTINGS_FILE=$(find . -type f -name 'settings.gradle' -not -path './.git/*' -print -quit)
           fi
 
           if [ -z "$SETTINGS_FILE" ]; then
@@ -102,6 +102,6 @@ jobs:
       - name: Ladda upp APK
         uses: actions/upload-artifact@v4
         with:
-          name: Bubbsun-v0.323-APK
+          name: Bubbsun-v0.324-APK
           path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
