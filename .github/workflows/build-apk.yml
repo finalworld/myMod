@@ -1,5 +1,4 @@
-name: Bygg Bubbsun v0.330 APK
-
+name: Bygg Bubbsun v0.340 APK
 
 on:
   workflow_dispatch:
@@ -22,28 +21,15 @@ jobs:
         run: |
           set -e
           SETTINGS_FILE=$(find . -type f \( -name 'settings.gradle.kts' -o -name 'settings.gradle' \) -not -path './.git/*' -print -quit)
-
           if [ -z "$SETTINGS_FILE" ]; then
             ZIP_FILE=$(find . -maxdepth 2 -type f -iname 'Bubbsun*.zip' -print -quit)
             [ -n "$ZIP_FILE" ] || ZIP_FILE=$(find . -maxdepth 2 -type f -iname '*.zip' -print -quit)
-
-            [ -n "$ZIP_FILE" ] || {
-              echo 'FEL: Android-projekt eller ZIP saknas.'
-              exit 1
-            }
-
-            rm -rf extracted-project
-            mkdir extracted-project
+            [ -n "$ZIP_FILE" ] || { echo 'FEL: Android-projekt eller ZIP saknas.'; exit 1; }
+            rm -rf extracted-project && mkdir extracted-project
             unzip -q "$ZIP_FILE" -d extracted-project
-
             SETTINGS_FILE=$(find extracted-project -type f \( -name 'settings.gradle.kts' -o -name 'settings.gradle' \) -print -quit)
           fi
-
-          [ -n "$SETTINGS_FILE" ] || {
-            echo 'FEL: settings.gradle saknas.'
-            exit 1
-          }
-
+          [ -n "$SETTINGS_FILE" ] || { echo 'FEL: settings.gradle saknas.'; exit 1; }
           echo "PROJECT_DIR=$(dirname "$SETTINGS_FILE")" >> "$GITHUB_ENV"
 
       - name: Installera Java 17
@@ -81,11 +67,11 @@ jobs:
         shell: bash
         run: |
           APK=$(find "$PROJECT_DIR/app/build/outputs/apk/release" -name '*.apk' -print -quit)
-          cp "$APK" "$PROJECT_DIR/app/build/outputs/apk/release/Bubbsun-v0.330.apk"
+          cp "$APK" "$PROJECT_DIR/app/build/outputs/apk/release/Bubbsun-v0.340.apk"
 
       - name: Ladda upp APK
         uses: actions/upload-artifact@v4
         with:
-          name: Bubbsun-v0.330-APK
-          path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/release/Bubbsun-v0.330.apk
+          name: Bubbsun-v0.340-APK
+          path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/release/Bubbsun-v0.340.apk
           if-no-files-found: error
