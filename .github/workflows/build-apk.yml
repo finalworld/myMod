@@ -1,6 +1,5 @@
 name: Bygg Bubbsun v0.400 APK
 
-
 on:
   workflow_dispatch:
   push:
